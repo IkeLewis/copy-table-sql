@@ -27,6 +27,18 @@
 ;; results for db2 tables are supported and may be converted to ORG
 ;; tables or (GitHub flavored) markdown tables.
 
+;;; Utility Functions
+
+(defun copy-table-next-line-same-col ()
+  (interactive)
+  (let ((goal-column (current-column)))
+    (next-line)))
+
+(defun copy-table-previous-line-same-col ()
+  (interactive)
+  (let ((goal-column (current-column)))
+    (previous-line)))
+
 ;;; API
 
 (defun copy-table-sql-db2-as-org ()
