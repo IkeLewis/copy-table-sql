@@ -27,5 +27,50 @@
 ;; results for db2 tables are supported and may be converted to ORG
 ;; tables or (GitHub flavored) markdown tables.
 
+;;; API
+
+(defun copy-table-sql-db2-as-org ()
+  "Copy a db2 SQL table as an org table."
+  (interactive)
+  (with-current-buffer (current-buffer)
+      (kill-ring-save (region-beginning) (region-end))
+    (with-temp-buffer
+      (org-mode)
+      (yank)
+      (whitespace-cleanup)
+      (goto-char 1)
+      (while (not (equal (point) (buffer-end 1)))
+	(insert "|")
+	(if (equal (point) (line-end-position))
+	    (forward-line)
+	  (forward-sexp)))
+      (insert "|")
+      (goto-char 2)
+      (org-cycle)
+      (kill-region 1 (point-max)))))
+
+(defun copy-table-sql-db2-as-github-markdown ()
+  "Copy a db2 SQL table as a GitHub flavored Markdown table."
+  (interactive)
+  (with-current-buffer (current-buffer)
+    (copy-table-sql-db2-as-org)
+    (with-temp-buffer
+      (yank)
+      (goto-char 1)
+      (while (not (equal (point) (buffer-end 1)))
+	(delete-char 1)
+	(end-of-line)
+	(delete-char -1)
+	(forward-line))
+      (goto-line 2)
+      ;; Run replace-string quietly
+      (let ((inhibit-message t))
+	(replace-string "+"
+			"|"
+			nil
+			(line-beginning-position)
+			(line-end-position)))
+      (kill-region 1 (point-max)))))
+
 (provide 'copy-table-sql)
 ;; copy-table-sql
