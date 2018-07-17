@@ -61,22 +61,64 @@
 
     "
   (interactive)
-  (with-current-buffer (current-buffer)
+  (let ((cb (current-buffer)))
+    (message "Copying table from %s" cb)
+    (with-current-buffer cb
       (kill-ring-save (region-beginning) (region-end))
-    (with-temp-buffer
-      (org-mode)
-      (yank)
-      (whitespace-cleanup)
-      (goto-char 1)
-      (while (not (equal (point) (buffer-end 1)))
+      (with-temp-buffer
+	(org-mode)
+	(yank)
+	(whitespace-cleanup)
+	(delete-trailing-whitespace)
+	;; delete-trailing-whitespace will allow up to 1 newline
+	;; character at the end of the buffer (because that's what we
+	;; want most of the time), but here we want to remove that
+	;; character, as well.
+	(goto-char (point-max))
+	(if (equal (line-beginning-position)
+		   (line-end-position))
+	    (delete-char -1))
+
+	;; Use the second line of space separated dash groupings to
+	;; format the headings (which may contain spaces).
+	(goto-line 1)
 	(insert "|")
-	(if (equal (point) (line-end-position))
-	    (forward-line)
-	  (forward-sexp)))
-      (insert "|")
-      (goto-char 2)
-      (org-cycle)
-      (kill-region 1 (point-max)))))
+	(goto-line 2)
+	(insert "|")
+	(forward-sexp)
+	(while (not (equal (point)
+			   (line-end-position)))
+	  (delete-char 1)
+	  (insert "|")
+	  (copy-table-previous-line-same-col)
+	  (delete-char -1)
+	  (insert "|")
+	  (copy-table-next-line-same-col)
+	  (forward-sexp))
+	(goto-line 1)
+	(move-end-of-line 1)
+	(insert "|")
+	(goto-line 2)
+	(move-end-of-line 1)
+	(insert "|")
+
+	(goto-line 3)
+	(while (not (equal (point) (buffer-end 1)))
+	  (insert "|")
+	  (if (equal (point) (line-end-position))
+	      (forward-line)
+	    (forward-sexp)))
+	(insert "|")
+	;; Make sure line 2 starts with '|-'
+	(goto-line 2)
+	(forward-char 1)
+	(delete-char 1)
+	(insert "-")
+	;; Call org-cycle to format the table
+	(goto-char 2)
+	(org-cycle)
+	;; Kill the table
+	(kill-region 1 (point-max))))))
 
 (defun copy-table-sql-db2-as-github-markdown ()
   "Copy a db2 SQL table as a GitHub flavored Markdown table.
@@ -121,4 +163,4 @@
       (kill-region 1 (point-max)))))
 
 (provide 'copy-table-sql)
-;; copy-table-sql
+;; copy-table-sql.el ends here
