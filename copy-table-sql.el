@@ -42,7 +42,24 @@
 ;;; API
 
 (defun copy-table-sql-db2-as-org ()
-  "Copy a db2 SQL table as an org table."
+  "Copy a db2 SQL table as an org table.  Example:
+
+    First     Last        Batting_Avg
+    --------- ----------- -----------
+     Nicholas Castellanos        .305
+       Miguel     Cabrera        .299
+	 John       Hicks        .278
+
+   Select the table.  Type M-x copy-table-sql-db2-as-org and then
+   C-y to paste the org table:
+
+    | First    | Last        | Batting Avg |
+    |----------+-------------+-------------|
+    | Nicholas | Castellanos |        .305 |
+    | Miguel   | Cabrera     |        .299 |
+    | John     | Hicks       |        .278 |
+
+    "
   (interactive)
   (with-current-buffer (current-buffer)
       (kill-ring-save (region-beginning) (region-end))
@@ -62,7 +79,26 @@
       (kill-region 1 (point-max)))))
 
 (defun copy-table-sql-db2-as-github-markdown ()
-  "Copy a db2 SQL table as a GitHub flavored Markdown table."
+  "Copy a db2 SQL table as a GitHub flavored Markdown table.
+
+    Example:
+
+    First     Last        Batting_Avg
+    --------- ----------- -----------
+     Nicholas Castellanos        .305
+       Miguel     Cabrera        .299
+	 John       Hicks        .278
+
+   Select the table.  Type M-x copy-table-sql-db2-as-github-markdown and then
+   C-y to paste the org table:
+
+     First    | Last        | Batting Avg
+    ----------|-------------|-------------
+     Nicholas | Castellanos |        .305
+     Miguel   | Cabrera     |        .299
+     John     | Hicks       |        .278
+
+    "
   (interactive)
   (with-current-buffer (current-buffer)
     (copy-table-sql-db2-as-org)
